@@ -15,7 +15,7 @@ export function SiteMotion() {
 
     const media = gsap.matchMedia();
 
-    media.add("(prefers-reduced-motion: no-preference)", () => {
+    media.add("(prefers-reduced-motion: no-preference) and (pointer: fine)", () => {
       const lenis = new Lenis({
         duration: 1.1,
         smoothWheel: true,

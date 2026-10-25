@@ -51,7 +51,7 @@ export function SceneMount() {
         <div className="scene-layer__fallback">
           <SceneFallback />
         </div>
-        {supported ? <SceneCanvas onReady={() => setReady(true)} /> : null}
+        {supported && !sceneState.isCoarse ? <SceneCanvas onReady={() => setReady(true)} /> : null}
       </SceneErrorBoundary>
     </div>
   );

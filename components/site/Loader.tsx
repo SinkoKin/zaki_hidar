@@ -34,7 +34,7 @@ export function Loader() {
     }
 
     // Safety net: never trap the user.
-    const safety = window.setTimeout(finish, 4000);
+    const safety = window.setTimeout(finish, 8000);
 
     // Lock scroll while loading.
     const prevOverflow = document.body.style.overflow;

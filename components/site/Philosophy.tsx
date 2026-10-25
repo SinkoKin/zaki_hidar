@@ -40,7 +40,7 @@ export function Philosophy() {
               src={aperture.image.src}
               alt={aperture.image.alt}
               fill
-              loading="eager"
+              loading="lazy"
               sizes="(max-width: 720px) 100vw, (max-width: 1440px) 44vw, 34rem"
               className="aperture__img"
               style={{ objectPosition: aperture.image.position ?? "center" }}

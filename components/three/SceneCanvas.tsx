@@ -10,6 +10,10 @@ type Props = {
   onReady: () => void;
 };
 
+// Full-screen canvas under an 11k-px page is the dominant scroll cost; DSP cap
+// and no AA on coarse pointers keep the per-frame raster affordable.
+const DPR_MAX = 1.5;
+
 export default function SceneCanvas({ onReady }: Props) {
   const reduced = sceneState.reducedMotion;
 
@@ -17,12 +21,12 @@ export default function SceneCanvas({ onReady }: Props) {
     <Canvas
       className="webgl-canvas"
       aria-hidden="true"
-      dpr={sceneState.isCoarse ? [1, 1.35] : [1, 1.75]}
+      dpr={[1, DPR_MAX]}
       frameloop={reduced ? "demand" : "always"}
       camera={{ fov: 36, near: 0.1, far: 50, position: [0.4, 0.2, 8] }}
       gl={{
         alpha: true,
-        antialias: true,
+        antialias: !sceneState.isCoarse,
         powerPreference: "high-performance",
         stencil: false,
         depth: true,

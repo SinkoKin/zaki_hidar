@@ -80,15 +80,14 @@ main {
   transition:
     background-color 500ms var(--ease-out),
     border-color 500ms var(--ease-out),
-    backdrop-filter 500ms var(--ease-out),
     transform 320ms var(--ease-out);
 }
 
+/* Solid scrim instead of backdrop-filter blur: keeps the header legible over
+   the WebGL canvas without paying the per-frame blur composite on scroll. */
 .site-header.is-scrolled {
   border-bottom-color: var(--line);
-  background: rgba(8, 8, 8, 0.82);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
-  backdrop-filter: blur(18px) saturate(120%);
+  background: rgba(8, 8, 8, 0.92);
 }
 
 .site-header.is-hidden {
@@ -120,22 +119,36 @@ main {
   place-items: center;
   border: 1px solid var(--line-strong);
   color: var(--bone);
-  font-family: var(--font-display), sans-serif;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: -0.09em;
-  line-height: 1;
   transition:
     color 400ms var(--ease-out),
     border-color 400ms var(--ease-out);
 }
 
-.brand__mark::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(200, 255, 61, 0.26);
-  transition: border-color 400ms var(--ease-out);
+/* Inner accent frame + monogram live in the LogoMark SVG so the favicon,
+   header and footer all render the identical brand mark. */
+.logo-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke-width: 5.2;
+}
+
+.logo-mark__frame {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  opacity: 0.42;
+  transition: opacity 400ms var(--ease-out);
+}
+
+.logo-mark__glyph {
+  stroke: currentColor;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+.logo-mark__glyph--accent {
+  stroke: var(--accent);
 }
 
 .brand:hover .brand__mark,
@@ -144,9 +157,9 @@ main {
   color: var(--accent);
 }
 
-.brand:hover .brand__mark::after,
-.brand:focus-visible .brand__mark::after {
-  border-color: rgba(200, 255, 61, 0.6);
+.brand:hover .logo-mark__frame,
+.brand:focus-visible .logo-mark__frame {
+  opacity: 0.85;
 }
 
 .brand__type {
@@ -1017,7 +1030,6 @@ main {
   inset: 0;
   z-index: 1;
   object-fit: cover;
-  filter: saturate(0.9) contrast(1.05) brightness(0.93);
 }
 
 .aperture::before {
@@ -1374,7 +1386,6 @@ main {
 
 .skills__image {
   object-fit: cover;
-  filter: saturate(0.82) contrast(1.02);
 }
 
 .skills__secondary {
@@ -1899,7 +1910,7 @@ main {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(8, 8, 8, 0.28), transparent 24%, transparent 66%, rgba(8, 8, 8, 0.66));
+  background: linear-gradient(180deg, rgba(8, 8, 8, 0.36), transparent 26%, transparent 64%, rgba(8, 8, 8, 0.72));
 }
 
 .gallery__parallax {
@@ -1909,14 +1920,10 @@ main {
 
 .gallery__img {
   object-fit: cover;
-  filter: saturate(0.78) contrast(1.03) brightness(0.96);
-  transition:
-    filter 700ms var(--ease-out),
-    transform 900ms var(--ease-out);
+  transition: transform 900ms var(--ease-out);
 }
 
 .gallery__item:hover .gallery__img {
-  filter: saturate(0.95) contrast(1.04) brightness(1.02);
   transform: scale(1.035);
 }
 
@@ -2139,7 +2146,6 @@ main {
 .brand--footer .brand__mark {
   width: 2.8rem;
   height: 2.8rem;
-  font-size: 0.92rem;
 }
 
 .footer__statement {
@@ -2875,7 +2881,7 @@ main {
   background: var(--black);
   color: var(--bone);
   overflow: hidden;
-  transition: opacity 0.6s var(--ease-out), visibility 0.6s var(--ease-out);
+  transition: opacity 0.32s var(--ease-out), visibility 0.32s var(--ease-out);
 }
 
 .site-loader--fading {

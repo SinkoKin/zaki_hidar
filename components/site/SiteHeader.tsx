@@ -4,6 +4,7 @@ import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { site } from "@/data/site";
 import { InstagramIcon } from "./InstagramIcon";
+import { LogoMark } from "./LogoMark";
 
 const focusableSelector =
   'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -18,17 +19,33 @@ export function SiteHeader() {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
+    let raf = 0;
+    let queuedY = -1;
+
+    const apply = () => {
+      raf = 0;
+      const y = queuedY;
+      queuedY = -1;
       setScrolled(y > 28);
       const delta = y - lastScrollY.current;
       if (y > 120 && delta > 6) setHidden(true);
       else if (delta < -4) setHidden(false);
       lastScrollY.current = y;
     };
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y === queuedY) return;
+      queuedY = y;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   const closeMenu = useCallback((restoreFocus: boolean) => {
@@ -43,6 +60,9 @@ export function SiteHeader() {
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Lenis owns window scrolling on desktop: pause it while the overlay is up
+    // so wheel input inside the menu behaves natively.
+    window.__zekoLenis?.stop();
     closeRef.current?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -75,6 +95,7 @@ export function SiteHeader() {
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
+      window.__zekoLenis?.start();
     };
   }, [open, closeMenu]);
 
@@ -84,7 +105,7 @@ export function SiteHeader() {
         <div className="site-header__inner">
           <a className="brand" href="#top" aria-label="Only Zeko — back to top">
             <span className="brand__mark" aria-hidden="true">
-              OZ
+              <LogoMark />
             </span>
             <span className="brand__type">
               <span className="brand__word">ONLY ZEKO</span>
@@ -139,6 +160,7 @@ export function SiteHeader() {
         aria-modal="true"
         aria-label="Site menu"
         aria-hidden={!open}
+        data-lenis-prevent
       >
         <div className="menu-overlay__grid">
           <div className="menu-overlay__top">

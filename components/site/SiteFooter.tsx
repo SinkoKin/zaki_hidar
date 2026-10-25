@@ -1,6 +1,7 @@
 import { ArrowUp, ArrowUpRight } from "lucide-react";
 import { site } from "@/data/site";
 import { InstagramIcon } from "./InstagramIcon";
+import { LogoMark } from "./LogoMark";
 
 export function SiteFooter() {
   return (
@@ -10,7 +11,7 @@ export function SiteFooter() {
           <div className="footer__identity">
             <a className="brand brand--footer" href="#top" aria-label="Only Zeko — back to top">
               <span className="brand__mark" aria-hidden="true">
-                OZ
+                <LogoMark />
               </span>
               <span className="brand__type">
                 <span className="brand__word">ONLY ZEKO</span>

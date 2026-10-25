@@ -16,11 +16,13 @@ export function SiteMotion() {
     const media = gsap.matchMedia();
 
     media.add("(prefers-reduced-motion: no-preference) and (pointer: fine)", () => {
+      // Lerp-driven smoothing: tracks the wheel closely (fast) with a short
+      // momentum tail, instead of a long fixed duration that lags behind input.
       const lenis = new Lenis({
-        duration: 1.1,
+        lerp: 0.11,
         smoothWheel: true,
-        touchMultiplier: 1.15,
-        wheelMultiplier: 0.95,
+        wheelMultiplier: 1.05,
+        touchMultiplier: 1.5,
       });
 
       const onLenisScroll = () => ScrollTrigger.update();
@@ -33,21 +35,41 @@ export function SiteMotion() {
       gsap.ticker.add(raf);
       gsap.ticker.lagSmoothing(0);
 
-      const cleanups: Array<() => void> = [];
+      // Anchor links scroll through Lenis so nav feels as fast as wheel input.
+      // The element's own scroll-margin-top is honoured to clear the header.
+      const onAnchorClick = (event: MouseEvent) => {
+        const link = (event.target as HTMLElement | null)?.closest?.("a[href^='#']");
+        if (!link) return;
+        const hash = link.getAttribute("href");
+        if (!hash || hash === "#") return;
+        const target = document.querySelector<HTMLElement>(hash);
+        if (!target) return;
 
-      // Section reveals — children stagger in with a soft blur lift.
+        event.preventDefault();
+        // Lenis already reads the target's scroll-margin-top (header clearance),
+        // so no extra offset here — only the easing matters.
+        lenis.scrollTo(hash, {
+          duration: 0.85,
+          easing: (t: number) => 1 - Math.pow(1 - t, 3),
+        });
+        history.replaceState(null, "", hash);
+      };
+      document.addEventListener("click", onAnchorClick);
+
+      const cleanups: Array<() => void> = [() => document.removeEventListener("click", onAnchorClick)];
+
+      // Section reveals — children stagger in as a soft lift.
+      // Transform + opacity only: blur filters are too costly to animate on scroll.
       gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((element) => {
         const targets = element.children.length
           ? Array.from(element.children)
           : [element];
         gsap.from(targets, {
           opacity: 0,
-          y: 32,
-          scale: 0.985,
-          filter: "blur(8px)",
-          duration: 0.95,
+          y: 28,
+          duration: 0.8,
           ease: "power3.out",
-          stagger: 0.09,
+          stagger: 0.08,
           scrollTrigger: {
             trigger: element,
             start: "top 86%",
@@ -65,7 +87,7 @@ export function SiteMotion() {
             opacity: 1,
             y: 0,
             clipPath: "inset(0% 0% 0% 0%)",
-            duration: 1.05,
+            duration: 0.9,
             ease: "power3.out",
             scrollTrigger: {
               trigger: heading,
@@ -74,6 +96,19 @@ export function SiteMotion() {
             },
           },
         );
+      });
+
+      // Hero drifts back as it leaves — cheap scroll depth cue on the entry shot.
+      gsap.to(".hero__content", {
+        yPercent: -9,
+        opacity: 0.35,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".hero",
+          start: "top top",
+          end: "bottom 40%",
+          scrub: true,
+        },
       });
 
       // Gallery parallax
@@ -149,12 +184,12 @@ export function SiteMotion() {
       }
 
       return () => {
+        cleanups.forEach((fn) => fn());
         lenis.off("scroll", onLenisScroll);
         gsap.ticker.remove(raf);
         gsap.ticker.lagSmoothing(500, 33);
         delete window.__zekoLenis;
         lenis.destroy();
-        cleanups.forEach((fn) => fn());
       };
     });
 
@@ -186,6 +221,9 @@ export function SiteMotion() {
     const philosophy = document.querySelector<HTMLElement>(".philosophy");
     const final = document.querySelector<HTMLElement>(".final");
 
+    let lastY = -1;
+    let queued = false;
+
     const updateScene = () => {
       if (!hero || !philosophy || !final) return;
 
@@ -210,14 +248,26 @@ export function SiteMotion() {
       }
     };
 
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        const y = window.scrollY;
+        if (y === lastY) return;
+        lastY = y;
+        updateScene();
+      });
+    };
+
     updateScene();
-    window.addEventListener("scroll", updateScene, { passive: true });
-    window.addEventListener("resize", updateScene, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
     window.addEventListener("pointermove", onPointerMove, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", updateScene);
-      window.removeEventListener("resize", updateScene);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       window.removeEventListener("pointermove", onPointerMove);
     };
   }, []);

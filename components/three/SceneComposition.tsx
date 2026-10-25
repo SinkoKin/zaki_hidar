@@ -162,13 +162,13 @@ function TrainingRig() {
         {/* Orange grip collars + end caps on the beam */}
         {[-0.6, 0, 0.6].map((x) => (
           <mesh key={x} position={[x, 2.68, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.05, 0.05, 0.1, 16]} />
+            <cylinderGeometry args={[0.05, 0.05, 0.1, 12]} />
             <meshStandardMaterial {...orangeStandard} />
           </mesh>
         ))}
         {[-2.16, 2.16].map((x) => (
           <mesh key={x} position={[x, 2.68, 0]}>
-            <sphereGeometry args={[0.05, 16, 12]} />
+            <sphereGeometry args={[0.05, 12, 8]} />
             <meshStandardMaterial {...darkSteel} />
           </mesh>
         ))}
@@ -305,7 +305,7 @@ function Atmosphere() {
       </Environment>
 
       <Sparkles
-        count={sceneState.isCoarse ? 20 : 44}
+        count={sceneState.isCoarse ? 12 : 26}
         scale={[10, 7, 2.2]}
         position={[0, 0.4, 0]}
         size={0.9}
@@ -315,7 +315,7 @@ function Atmosphere() {
         noise={0.4}
       />
       <Sparkles
-        count={sceneState.isCoarse ? 14 : 28}
+        count={sceneState.isCoarse ? 8 : 16}
         scale={[12, 8, 2.2]}
         position={[0, 0, -1]}
         size={0.65}
@@ -327,14 +327,14 @@ function Atmosphere() {
 
       <Grid
         position={[0, -2.56, 0]}
-        args={[18, 18]}
+        args={[14, 14]}
         cellSize={0.48}
         cellThickness={0.5}
         cellColor="#2b2f27"
         sectionSize={2.4}
         sectionThickness={0.9}
         sectionColor="#414736"
-        fadeDistance={17}
+        fadeDistance={13}
         fadeStrength={2.1}
         infiniteGrid
         followCamera={false}

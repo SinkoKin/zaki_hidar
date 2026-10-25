@@ -8,11 +8,12 @@ export function Loader() {
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const minMs = reduce ? 400 : 1500;
+    // Short splash: keep the brand moment but get the user scrolling fast.
+    const minMs = reduce ? 150 : 700;
 
     const hide = () => {
       setFading(true);
-      window.setTimeout(() => setVisible(false), reduce ? 0 : 600);
+      window.setTimeout(() => setVisible(false), reduce ? 0 : 320);
     };
 
     // Hide once the page is fully loaded, but never faster than minMs.
@@ -25,16 +26,8 @@ export function Loader() {
 
     const timer = window.setTimeout(finish, minMs);
 
-    if (document.readyState === "complete") {
-      window.setTimeout(finish, minMs);
-    } else {
-      window.addEventListener("load", () => window.setTimeout(finish, 200), {
-        once: true,
-      });
-    }
-
     // Safety net: never trap the user.
-    const safety = window.setTimeout(finish, 8000);
+    const safety = window.setTimeout(finish, 3000);
 
     // Lock scroll while loading.
     const prevOverflow = document.body.style.overflow;

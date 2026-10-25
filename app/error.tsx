@@ -3,6 +3,7 @@
 import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
+import { LogoMark } from "@/components/site/LogoMark";
 
 export default function ErrorPage({
   error,
@@ -21,7 +22,7 @@ export default function ErrorPage({
       <div className="container status-page__inner">
         <Link className="brand" href="/" aria-label="Only Zeko home">
           <span className="brand__mark" aria-hidden="true">
-            OZ
+            <LogoMark />
           </span>
           <span className="brand__type">
             <span className="brand__word">ONLY ZEKO</span>

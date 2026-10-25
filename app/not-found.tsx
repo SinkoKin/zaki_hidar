@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { site } from "@/data/site";
+import { LogoMark } from "@/components/site/LogoMark";
 
 export default function NotFound() {
   return (
@@ -9,7 +10,7 @@ export default function NotFound() {
       <div className="container status-page__inner">
         <Link className="brand" href="/" aria-label="Only Zeko home">
           <span className="brand__mark" aria-hidden="true">
-            OZ
+            <LogoMark />
           </span>
           <span className="brand__type">
             <span className="brand__word">ONLY ZEKO</span>

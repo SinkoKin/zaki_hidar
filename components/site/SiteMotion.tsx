@@ -79,25 +79,46 @@ export function SiteMotion() {
       });
 
       // Heading clip-reveal — type rises from a masked baseline.
-      gsap.utils.toArray<HTMLElement>("section h2, .final__title").forEach((heading) => {
-        gsap.fromTo(
-          heading,
-          { opacity: 0, y: 22, clipPath: "inset(110% 0% 0% 0%)" },
-          {
-            opacity: 1,
-            y: 0,
-            clipPath: "inset(0% 0% 0% 0%)",
-            duration: 0.9,
+      // clip-path is expensive on mobile GPUs; use a simple fade there.
+      if (window.matchMedia("(pointer: coarse)").matches) {
+        gsap.utils.toArray<HTMLElement>("section h2, .final__title").forEach((heading) => {
+          gsap.from(heading, {
+            opacity: 0,
+            y: 16,
+            duration: 0.6,
             ease: "power3.out",
             scrollTrigger: {
               trigger: heading,
               start: "top 88%",
               once: true,
             },
-          },
-        );
-      });
+          });
+        });
+      } else {
+        gsap.utils.toArray<HTMLElement>("section h2, .final__title").forEach((heading) => {
+          gsap.fromTo(
+            heading,
+            { opacity: 0, y: 22, clipPath: "inset(110% 0% 0% 0%)" },
+            {
+              opacity: 1,
+              y: 0,
+              clipPath: "inset(0% 0% 0% 0%)",
+              duration: 0.9,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: heading,
+                start: "top 88%",
+                once: true,
+              },
+            },
+          );
+        });
+      }
 
+    // Heavy scroll-driven effects (parallax, scrub, hero drift, aperture scan)
+    // only on fine pointers — on touch devices they cost a frame per scroll and
+    // cause jank on mid-range phones (e.g. Galaxy A23).
+    if (!window.matchMedia("(pointer: coarse)").matches) {
       // Hero drifts back as it leaves — cheap scroll depth cue on the entry shot.
       gsap.to(".hero__content", {
         yPercent: -9,
@@ -156,6 +177,7 @@ export function SiteMotion() {
           scrub: true,
         },
       });
+    }
 
       // Magnetic buttons — subtle cursor pull on desktop pointers.
       if (!window.matchMedia("(pointer: coarse)").matches) {
@@ -211,6 +233,9 @@ export function SiteMotion() {
   }, []);
 
   useEffect(() => {
+    // On touch devices the 3D scene is disabled, so there's nothing to update.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
     const onPointerMove = (event: PointerEvent) => {
       if (event.pointerType === "touch") return;
       sceneState.pointerX = (event.clientX / window.innerWidth) * 2 - 1;

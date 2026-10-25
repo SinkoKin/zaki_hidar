@@ -1198,11 +1198,6 @@ main {
   z-index: 2;
 }
 
-.skills,
-.gallery {
-  background: var(--black);
-}
-
 .skills {
   border-top: 1px solid var(--line);
 }
